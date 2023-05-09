@@ -15,7 +15,7 @@ from http.server import BaseHTTPRequestHandler
 
 import requests
 
-HOME_URL = "https://news-digest.vercel.app"
+HOME_URL = "https://news-digest-line.vercel.app"
 REDIRECT_URI = f"{HOME_URL}/api/oauth"
 
 
