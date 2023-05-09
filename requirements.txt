@@ -1,0 +1,8 @@
+# for oauth.py, subscribe.py
+requests==2.26.0
+
+# for gdrive.py
+google-api-python-client==2.0.2
+google-auth==1.35.0
+pyyaml==6.0
+
