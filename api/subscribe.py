@@ -119,6 +119,7 @@ class handler(BaseHTTPRequestHandler):
         )
         weekly_topics = (
             ("Science & Technology", " (Weekly)"),
+            ("Health & Food", " (Weekly)"),
         )
         n_options = len(daily_topics) + len(weekly_topics)
 
@@ -126,7 +127,7 @@ class handler(BaseHTTPRequestHandler):
         topics = Subscriptions('subscriptions_Daily.yml').topics(name)
         sel = lambda x: " selected" if x in topics else ""
         options_daily = "\n".join(
-                f'{" "*12}<option value="{t}"{sel(t)}>{t}{c}</option>'
+            f'{" "*12}<option value="{t}"{sel(t)}>{t}{c}</option>'
             for t, c in daily_topics)
         topics = Subscriptions("subscriptions_Weekly.yml").topics(name)
         options_weekly = "\n".join(
@@ -187,7 +188,7 @@ class handler(BaseHTTPRequestHandler):
             # use original name
             name = tok_tbl.gen_unique_name(target, token)
 
-        weekly = ["Science & Technology"]
+        weekly = ["Science & Technology", "Health & Food"]
         topics_daily = [t for t in topics if t not in weekly]
         topics_weekly = [t for t in topics if t in weekly]
 
