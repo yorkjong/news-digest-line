@@ -352,14 +352,25 @@ class Subscriptions:
         for elem in self._table:
             yield elem
 
-    def topics(self, client):
-        '''Get subscribed topics of a client.
+    def subscribable_topics(self):
+        '''Get subscribable topics.
+
+        Returns:
+            ([str]): a sequence of subscribable topics.
+        '''
+        subscribable = []
+        for topics, _ in self._table:
+            subscribable.append(topics[0])
+        return subscribable
+
+    def topics(self, client=None):
+        '''Get topics subscribed by a client.
 
         Args:
             client (str): the client.
 
         Returns:
-            ([str]): the subscribed topics.
+            ([str]): the topics subscribed by the client.
         '''
         subscribed = []
         for topics, clients in self._table:
@@ -386,7 +397,7 @@ class Subscriptions:
                     clients.remove(client)
 
     def clients(self):
-        '''Get all clients in subscriptions.
+        '''Get all clients in the subscriptions.
 
         Returns:
             (set): all clients.
@@ -397,7 +408,7 @@ class Subscriptions:
         return all
 
     def add_item(self, topic, client):
-        '''Add an item to subscriptions.
+        '''Add a subscription to the table.
 
         Args:
             topic (str): topic (heading) to subscribe.
@@ -466,7 +477,6 @@ def test_TokenTable():
 
 def test_Subscriptions():
     tbl = Subscriptions('subscriptions_Daily.yml')
-    valid_clients = tbl.clients()
     #tbl.save()
     print(f"{tbl._table}\n")
     tbl.add_item('IT', 'Andy')
