@@ -202,6 +202,18 @@ class TokenTable:
         '''
         return self._table[client]
 
+    def clients_from_tokens(self, tokens):
+        '''Look-up clients from given tokens.
+
+        Args:
+            ([str]): a list of tokens to look-up
+
+        Returns:
+            ([str]): a list of look-up clients
+        '''
+        tbl = dict(zip(self.tokens(), self.clients()))
+        return [tbl[t] for t in tokens]
+
     def __getitem__(self, client):
         '''Get token with given client (target).
 
