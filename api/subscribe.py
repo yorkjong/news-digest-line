@@ -123,7 +123,6 @@ class handler(BaseHTTPRequestHandler):
         )
         n_options = len(daily_topics) + len(weekly_topics)
 
-
         topics = Subscriptions('subscriptions_Daily.yml').topics(name)
         sel = lambda x: " selected" if x in topics else ""
         options_daily = "\n".join(
@@ -188,20 +187,20 @@ class handler(BaseHTTPRequestHandler):
             # use original name
             name = tok_tbl.gen_unique_name(target, token)
 
-        weekly = ["Science & Technology", "Health & Food"]
+        subs_w = Subscriptions('subscriptions_Weekly.yml')
+        weekly = subs_w.subscribable_topics()
         topics_daily = [t for t in topics if t not in weekly]
         topics_weekly = [t for t in topics if t in weekly]
 
         subs_d = Subscriptions('subscriptions_Daily.yml')
-        if topics_daily != subs_d.topics(name):
+        if sorted(topics_daily) != sorted(subs_d.topics(name)):
             subs_d.update_topics(name, topics_daily)
             try:
                 subs_d.save()
             except:
                 self._send_error(423, str(e))
                 return
-        subs_w = Subscriptions('subscriptions_Weekly.yml')
-        if topics_weekly != subs_w.topics(name):
+        if sorted(topics_weekly) != sorted(subs_w.topics(name)):
             subs_w.update_topics(name, topics_weekly)
             try:
                 subs_w.save()
