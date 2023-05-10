@@ -84,19 +84,20 @@ class handler(BaseHTTPRequestHandler):
                 name = target
 
         subs_d = Subscriptions('subscriptions_Daily.yml')
-        subs_w = Subscriptions('subscriptions_Weekly.yml')
         daily_topics = subs_d.subscribable_topics()
-        weekly_topics = subs_w.subscribable_topics()
-        n_options = len(daily_topics) + len(weekly_topics)
-
-        sel = lambda x: " selected" if x in subs_d.topics(name) else ""
+        sel_d = lambda x: " selected" if x in subs_d.topics(name) else ""
         options_daily = "\n".join(
-            f'{" "*12}<option value="{t}"{sel(t)}>{t}</option>'
+            f'{" "*12}<option value="{t}"{sel_d(t)}>{t}</option>'
             for t in daily_topics)
-        sel = lambda x: " selected" if x in subs_d.topics(name) else ""
+
+        subs_w = Subscriptions('subscriptions_Weekly.yml')
+        weekly_topics = subs_w.subscribable_topics()
+        sel_w = lambda x: " selected" if x in subs_w.topics(name) else ""
         options_weekly = "\n".join(
-            f'{" "*4}<option value="{t}"{sel(t)}>{t} (Weekly)</option>'
+            f'{" "*4}<option value="{t}"{sel_w(t)}>{t} (Weekly)</option>'
             for t in weekly_topics)
+
+        n_options = len(daily_topics) + len(weekly_topics)
 
         html = f"""
 <!DOCTYPE html>
