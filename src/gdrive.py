@@ -2,7 +2,7 @@
 The module implement operations of files in a folder in the Google Drive.
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2023/05/05 (initial version) ~ 2023/05/09 (last revision)"
+__date__ = "2023/05/05 (initial version) ~ 2023/05/10 (last revision)"
 
 __all__ = [
     'TokenTable',
@@ -152,7 +152,7 @@ class Drive:
                 fileId=file_id, media_body=media,
                 fields='version').execute()
         except HttpError as error:
-            print(f"An error occurred: {error}")
+            raise Exception(f"{error}")
 
 
 class TokenTable:
@@ -262,14 +262,15 @@ class TokenTable:
         tokens = self.tokens()
         name = client
 
-        # repeated client names (e.g., regenerated tokens)
+        # case 1: repeated client names (e.g., regenerated tokens)
         if client in clients and token not in tokens:
             name = self._gen_unique_name(client)
-        # repeated tokens (e.g., renamed targets)
+        # case 2: repeated tokens (e.g., renamed targets)
         elif client not in clients and token in tokens:
             # use old name
             i = tokens.index(token)
             name = clients[i]
+        # case 3: another case of repeated tokens
         elif client in clients and token in tokens:
             if self._table[client] != token:
                 # use old name
