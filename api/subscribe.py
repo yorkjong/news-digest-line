@@ -152,7 +152,9 @@ class handler(BaseHTTPRequestHandler):
             <title>Subscription to news-digest (token: {token})</title>
             <style>
                 #topics {{
-                    height: {n_options+2}em;
+                    height: auto;
+                    max-height: 500px;
+                    overflow-y: scroll;
                 }}
             </style>
         </head>
@@ -160,7 +162,7 @@ class handler(BaseHTTPRequestHandler):
             <h1>Subscription to news-digest</h1>
             <form method="post" action="/api/subscribe">
                 <label for="topics">請選取分類後按下訂閱（可複選）：</label><br/><br/>
-                <select name="topics" id="topics" multiple>
+                <select name="topics" id="topics" multiple size="{n_options}">
         {options_daily}
         {options_weekly}
                 </select>
