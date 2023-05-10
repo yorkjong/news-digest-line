@@ -74,15 +74,26 @@ class handler(BaseHTTPRequestHandler):
     '''
 
     def _send_error(self, err_code, err_msg):
+        '''Send a error page.
+
+        Args:
+            err_code (int): error code to send.
+            err_msg (str): error message to send.
+        '''
         self.send_response(err_code)    # 401, 404
         self.end_headers()
         self.wfile.write(err_msg.encode())
 
-    def _send_html(self, html_body):
+    def _send_html(self, html):
+        '''Send a normal (code 200) HTML page.
+
+        Args:
+            html (str): a HTML string to send.
+        '''
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write(html_body.encode())
+        self.wfile.write(html.encode())
 
     def do_GET(self):
         query = urlparse(self.path).query
@@ -133,7 +144,7 @@ class handler(BaseHTTPRequestHandler):
             f'{" "*12}<option value="{t}"{sel(t)}>{t}{c}</option>'
             for t, c in weekly_topics)
 
-        html_body = f"""
+        html = f"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -160,7 +171,7 @@ class handler(BaseHTTPRequestHandler):
         </body>
         </html>
         """
-        self._send_html(html_body)
+        self._send_html(html)
 
     def do_POST(self):
         content_length = int(self.headers.get('Content-Length', 0))
@@ -209,7 +220,7 @@ class handler(BaseHTTPRequestHandler):
                 return
 
         html_topics = "\n".join(f"{' '*8}<li>{topic}</li>" for topic in topics)
-        html_body = f"""
+        html = f"""
         <!DOCTYPE html>
         <html>
         <head>
@@ -219,25 +230,25 @@ class handler(BaseHTTPRequestHandler):
         <body>
         """
         if topics:
-            html_body += "<h1>訂閱完成！</h1>"
+            html += "<h1>訂閱完成！</h1>"
         else:
-            html_body += "<h1>已取消全部訂閱！</h1>"
-        html_body += f"""
+            html += "<h1>已取消全部訂閱！</h1>"
+        html += f"""
             <p>name: {name}</p>
             <p>token: {token}</p>
         """
         if topics:
-            html_body += f"""
+            html += f"""
                 <p>你已訂閱的主題如下:</p>
                 <ul>
             {html_topics}
                 </ul>
             """
-        html_body += """
+        html += """
         </body>
         </html>
         """
-        self._send_html(html_body)
+        self._send_html(html)
 
 
 #------------------------------------------------------------------------------
