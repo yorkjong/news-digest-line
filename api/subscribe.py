@@ -137,6 +137,7 @@ class handler(BaseHTTPRequestHandler):
         <!DOCTYPE html>
         <html>
         <head>
+            <meta charset="utf-8">
             <title>Subscription to news-digest (token: {token})</title>
             <style>
                 #topics {{
@@ -147,14 +148,14 @@ class handler(BaseHTTPRequestHandler):
         <body>
             <h1>Subscription to news-digest</h1>
             <form method="post" action="/api/subscribe">
-                <label for="topics">Choose topics:</label><br/><br/>
+                <label for="topics">請選取分類後按下訂閱（可複選）：</label><br/><br/>
                 <select name="topics" id="topics" multiple>
         {options_daily}
         {options_weekly}
                 </select>
                 <input type="hidden" name="token" value="{token}">
                 <input type="hidden" name="target" value="{name}"><br/><br/>
-                <input type="submit" value="Subscribe">
+                <input type="submit" value="訂閱">
             </form>
         </body>
         </html>
@@ -216,13 +217,23 @@ class handler(BaseHTTPRequestHandler):
             <title>Subscription Result (token: {token})</title>
         </head>
         <body>
-            <h1>Thanks for subscribing!</h1>
+        """
+        if topics:
+            html_body += "<h1>訂閱完成！</h1>"
+        else:
+            html_body += "<h1>已取消全部訂閱！</h1>"
+        html_body += f"""
             <p>name: {name}</p>
             <p>token: {token}</p>
-            <p>You have subscribed to the following topics:</p>
-            <ul>
-        {html_topics}
-            </ul>
+        """
+        if topics:
+            html_body += f"""
+                <p>你已訂閱的主題如下:</p>
+                <ul>
+            {html_topics}
+                </ul>
+            """
+        html_body += """
         </body>
         </html>
         """
