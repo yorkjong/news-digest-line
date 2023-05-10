@@ -313,7 +313,7 @@ class TokenTable:
             clients ([str]): a list of clients.
         '''
         for client in clients:
-            del self._table[client]
+            self._table.pop(client, None)
 
     def __delitem__(self, clients):
         '''Remove clients in the table.
@@ -324,7 +324,7 @@ class TokenTable:
         if isinstance(clients, (list, tuple)):
             self.remove_clients(clients)
         else:
-            del self._table[clients]
+            self.remove_clients([clients])
 
     def remove_tokens(self, tokens=[]):
         '''Remove tokens in the table.
