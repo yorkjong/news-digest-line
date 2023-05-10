@@ -22,33 +22,9 @@ else:
     # on Vercel environment
     sys.path.append(os.path.join(os.getcwd(), 'src'))
 
+from line import token_status, is_invalid_token
 from gdrive import TokenTable, Subscriptions
 
-
-#------------------------------------------------------------------------------
-# Token Status (Line Notify)
-#------------------------------------------------------------------------------
-
-def token_status(token):
-    '''Check status of a Line Access Token.
-
-    Args:
-        token (str): line access token
-
-    Returns:
-        (dict): a dictionary of the reponsed JSON
-    '''
-    url = 'https://notify-api.line.me/api/status'
-    headers = {
-        'Authorization': f'Bearer {token}'
-    }
-
-    resp = requests.get(url, headers=headers)
-    try:
-        return resp.json()
-    except JSONDecodeError:
-        print('Response could not be serialized')
-        return {}
 
 #------------------------------------------------------------------------------
 # handler of the Vercel serverless function
@@ -97,8 +73,8 @@ class handler(BaseHTTPRequestHandler):
         tbl = TokenTable('access_tokens.yml')
         name = tbl.gen_unique_name(target, token)
         if name != target:
-            # in case of regenerating tokens (and remove old one).
-            if token_status(tbl[target]).get('status') == 401:
+            # check if the old token is invalid.
+            if is_invalid_token(tbl[target]):
                 tbl[target] = token     # use new token
                 try:
                     tbl.save()
