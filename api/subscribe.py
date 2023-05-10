@@ -147,6 +147,23 @@ class handler(BaseHTTPRequestHandler):
             max-height: 500px;
             overflow-y: scroll;
         }}
+
+        /* Adjusting the display effect on mobile devices */
+        @media only screen and (max-width: 600px) {{
+            #topics {{
+                max-height: none;
+                overflow-y: visible;
+            }}
+            label {{
+                font-size: 16px;
+            }}
+            select {{
+                font-size: 16px;
+            }}
+            input[type="submit"] {{
+                font-size: 16px;
+            }}
+        }}
     </style>
 </head>
 <body>
