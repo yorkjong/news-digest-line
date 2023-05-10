@@ -155,13 +155,13 @@ class handler(BaseHTTPRequestHandler):
                 overflow-y: visible;
             }}
             label {{
-                font-size: 16px;
+                font-size: 32px;
             }}
             select {{
-                font-size: 16px;
+                font-size: 32px;
             }}
             input[type="submit"] {{
-                font-size: 16px;
+                font-size: 32px;
             }}
         }}
     </style>
