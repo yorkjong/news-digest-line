@@ -120,29 +120,21 @@ class handler(BaseHTTPRequestHandler):
                     return
                 name = target
 
-        daily_topics = (
-            ("Tesla & SpaceX; Vehicle", ""),
-            ("Tech Industry", ""),
-            ("Finance", ""),
-            ("Taiwan", ""),
-            ("Crypto", ""),
-            ("IT", " (AI, Software)"),
-        )
-        weekly_topics = (
-            ("Science & Technology", " (Weekly)"),
-            ("Health & Food", " (Weekly)"),
-        )
+        subs_d = Subscriptions('subscriptions_Daily.yml')
+        subs_w = Subscriptions('subscriptions_Weekly.yml')
+        daily_topics = subs_d.subscribable_topics()
+        weekly_topics = subs_w.subscribable_topics()
         n_options = len(daily_topics) + len(weekly_topics)
 
-        topics = Subscriptions('subscriptions_Daily.yml').topics(name)
+        topics = subs_w.topics(name)
         sel = lambda x: " selected" if x in topics else ""
         options_daily = "\n".join(
-            f'{" "*12}<option value="{t}"{sel(t)}>{t}{c}</option>'
-            for t, c in daily_topics)
-        topics = Subscriptions("subscriptions_Weekly.yml").topics(name)
+            f'{" "*12}<option value="{t}"{sel(t)}>{t}</option>'
+            for t in daily_topics)
+        topics = subs_d.topics(name)
         options_weekly = "\n".join(
-            f'{" "*12}<option value="{t}"{sel(t)}>{t}{c}</option>'
-            for t, c in weekly_topics)
+            f'{" "*12}<option value="{t}"{sel(t)}>{t} (Weekly)</option>'
+            for t in weekly_topics)
 
         html = f"""
         <!DOCTYPE html>
@@ -170,6 +162,9 @@ class handler(BaseHTTPRequestHandler):
                 <input type="hidden" name="target" value="{name}"><br/><br/>
                 <input type="submit" value="訂閱">
             </form>
+        <div style="background-color: #ffffcc; color: #000000; padding: 10px;">
+        請將此頁面加入書籤，以利後續更改訂閱主題
+        </div>
         </body>
         </html>
         """
