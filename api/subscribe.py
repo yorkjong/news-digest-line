@@ -126,48 +126,47 @@ class handler(BaseHTTPRequestHandler):
         weekly_topics = subs_w.subscribable_topics()
         n_options = len(daily_topics) + len(weekly_topics)
 
-        topics = subs_w.topics(name)
-        sel = lambda x: " selected" if x in topics else ""
+        sel = lambda x: " selected" if x in subs_d.topics(name) else ""
         options_daily = "\n".join(
             f'{" "*12}<option value="{t}"{sel(t)}>{t}</option>'
             for t in daily_topics)
-        topics = subs_d.topics(name)
+        sel = lambda x: " selected" if x in subs_d.topics(name) else ""
         options_weekly = "\n".join(
-            f'{" "*12}<option value="{t}"{sel(t)}>{t} (Weekly)</option>'
+            f'{" "*4}<option value="{t}"{sel(t)}>{t} (Weekly)</option>'
             for t in weekly_topics)
 
         html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>Subscription to news-digest (token: {token})</title>
-            <style>
-                #topics {{
-                    height: auto;
-                    max-height: 500px;
-                    overflow-y: scroll;
-                }}
-            </style>
-        </head>
-        <body>
-            <h1>Subscription to news-digest</h1>
-            <form method="post" action="/api/subscribe">
-                <label for="topics">請選取分類後按下訂閱（可複選）：</label><br/><br/>
-                <select name="topics" id="topics" multiple size="{n_options}">
-        {options_daily}
-        {options_weekly}
-                </select>
-                <input type="hidden" name="token" value="{token}">
-                <input type="hidden" name="target" value="{name}"><br/><br/>
-                <input type="submit" value="訂閱">
-            </form>
-        <div style="background-color: #ffffcc; color: #000000; padding: 10px;">
-        請將此頁面加入書籤，以利後續更改訂閱主題
-        </div>
-        </body>
-        </html>
-        """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Subscription to news-digest (token: {token})</title>
+    <style>
+        #topics {{
+            height: auto;
+            max-height: 500px;
+            overflow-y: scroll;
+        }}
+    </style>
+</head>
+<body>
+    <h1>Subscription to news-digest</h1>
+    <form method="post" action="/api/subscribe">
+        <label for="topics">請選取分類後按下訂閱（可複選）：</label><br/><br/>
+        <select name="topics" id="topics" multiple size="{n_options}">
+{options_daily}
+{options_weekly}
+        </select>
+        <input type="hidden" name="token" value="{token}">
+        <input type="hidden" name="target" value="{name}"><br/><br/>
+        <input type="submit" value="訂閱">
+    </form>
+    <div style="background-color: #ffffcc; color: #000000; padding: 10px;">
+    請將此頁面加入書籤，以利後續更改訂閱主題
+    </div>
+</body>
+</html>
+"""
         self._send_html(html)
 
     def do_POST(self):
@@ -216,35 +215,32 @@ class handler(BaseHTTPRequestHandler):
                 self._send_error(423, str(e))
                 return
 
-        html_topics = "\n".join(f"{' '*8}<li>{topic}</li>" for topic in topics)
+        html_topics = "\n".join(f"{' '*4}<li>{topic}</li>" for topic in topics)
         html = f"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <title>Subscription Result (token: {token})</title>
-        </head>
-        <body>
-        """
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Subscription Result (token: {token})</title>
+</head>
+<body>
+"""
         if topics:
-            html += "<h1>訂閱完成！</h1>"
+            html += "    <h1>訂閱完成！</h1>\n"
         else:
-            html += "<h1>已取消全部訂閱！</h1>"
+            html += "    <h1>已取消全部訂閱！</h1>\n"
         html += f"""
-            <p>name: {name}</p>
-            <p>token: {token}</p>
-        """
+    <p>name: {name}</p>
+    <p>token: {token}</p>
+"""
         if topics:
             html += f"""
-                <p>你已訂閱的主題如下:</p>
-                <ul>
-            {html_topics}
-                </ul>
-            """
-        html += """
-        </body>
-        </html>
-        """
+    <p>你已訂閱的主題如下:</p>
+    <ul>
+{html_topics}
+    </ul>
+"""
+        html += "</body>\n</html>\n"
         self._send_html(html)
 
 
