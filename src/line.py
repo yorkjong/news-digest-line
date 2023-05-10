@@ -2,10 +2,12 @@
 Line Notify.
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2023/03/23 (initial version) ~ 2023/05/08 (last revision)"
+__date__ = "2023/03/23 (initial version) ~ 2023/05/10 (last revision)"
 
 __all__ = [
     'notify_message',
+    'token_status',
+    'is_invalid_token',
 ]
 
 import requests
@@ -52,6 +54,44 @@ def split_string(input_str, max_chars=1000):
     # Add the last substring to the result list
     result.append(input_str[start:])
     return result
+
+
+#------------------------------------------------------------------------------
+# Line Access Token
+#------------------------------------------------------------------------------
+
+def token_status(token):
+    '''Check status of a Line Access Token.
+
+    Args:
+        token (str): line access token
+
+    Returns:
+        (dict): a dictionary of the reponsed JSON
+    '''
+    url = 'https://notify-api.line.me/api/status'
+    headers = {
+        'Authorization': f'Bearer {token}'
+    }
+
+    resp = requests.get(url, headers=headers)
+    try:
+        return resp.json()
+    except JSONDecodeError:
+        print('Response could not be serialized')
+        return {}
+
+
+def is_invalid_token(token):
+    '''Check if a is valid.
+
+    Args:
+        token (str): line access token
+
+    Returns:
+        (bool): True if token invalid; Flase otherwise.
+    '''
+    return token_status(token).get('status') == 401
 
 
 #------------------------------------------------------------------------------
