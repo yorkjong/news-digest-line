@@ -2,7 +2,7 @@
 The module implement a Vercel Serverlesss Function to subscrip topics of news.
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2023/05/04 (initial version) ~ 2023/05/08 (last revision)"
+__date__ = "2023/05/04 (initial version) ~ 2023/05/10 (last revision)"
 
 __all__ = [
     'handler',
@@ -73,6 +73,17 @@ class handler(BaseHTTPRequestHandler):
     Note: The class name must be handler.
     '''
 
+    def _send_error(self, err_code, err_msg):
+        self.send_response(err_code)    # 401, 404
+        self.end_headers()
+        self.wfile.write(err_msg.encode())
+
+    def _send_html(self, html_body):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        self.wfile.write(html_body.encode())
+
     def do_GET(self):
         query = urlparse(self.path).query
         params = parse_qs(query)
@@ -82,9 +93,7 @@ class handler(BaseHTTPRequestHandler):
         target = status.get('target', '')
 
         if not target:
-            self.send_response(status['status'])    # 401, 404
-            self.end_headers()
-            self.wfile.write(status['message'].encode())
+            self._send_error(status['status'], status['message'])
             return
 
         tbl = TokenTable('access_tokens.yml')
@@ -93,7 +102,11 @@ class handler(BaseHTTPRequestHandler):
             # in case of regenerating tokens.
             if token_status(tbl[target]).get('status') != 200:
                 tbl[target] = token
-                tbl.save()
+                try:
+                    tbl.save()
+                except Exception as e:
+                    self._send_error(423, str(e))
+                    return
                 name = target
 
         daily_topics = (
@@ -119,10 +132,6 @@ class handler(BaseHTTPRequestHandler):
         options_weekly = "\n".join(
             f'{" "*12}<option value="{t}"{sel(t)}>{t}{c}</option>'
             for t, c in weekly_topics)
-
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
 
         html_body = f"""
         <!DOCTYPE html>
@@ -150,7 +159,7 @@ class handler(BaseHTTPRequestHandler):
         </body>
         </html>
         """
-        self.wfile.write(html_body.encode())
+        self._send_html(html_body)
 
     def do_POST(self):
         content_length = int(self.headers.get('Content-Length', 0))
@@ -162,29 +171,41 @@ class handler(BaseHTTPRequestHandler):
         target = post_params.get('target', [''])[0]
 
         if not target:
-            self.send_response(401)
-            self.end_headers()
-            self.wfile.write(b'Invalid access token')
+            self._send_error(401, 'Invalid access token')
             return
 
         tok_tbl = TokenTable('access_tokens.yml')
-        target = tok_tbl.add_item(token, target)
-        tok_tbl.save()
+        if token not in tok_tbl.tokens():
+            name = tok_tbl.add_item(token, target)
+            try:
+                tok_tbl.save()
+            except:
+                self._send_error(423, str(e))
+                return
+        else:
+            # use original name
+            name = tok_tbl.gen_unique_name(target, token)
 
         weekly = ["Science & Technology"]
         topics_daily = [t for t in topics if t not in weekly]
         topics_weekly = [t for t in topics if t in weekly]
 
-        subscriptions_d = Subscriptions('subscriptions_Daily.yml')
-        subscriptions_d.update_topics(target, topics_daily)
-        subscriptions_d.save()
-        subscriptions_w = Subscriptions('subscriptions_Weekly.yml')
-        subscriptions_w.update_topics(target, topics_weekly)
-        subscriptions_w.save()
-
-        self.send_response(200)
-        self.send_header('Content-type', 'text/html')
-        self.end_headers()
+        subs_d = Subscriptions('subscriptions_Daily.yml')
+        if topics_daily != subs_d.topics(name):
+            subs_d.update_topics(name, topics_daily)
+            try:
+                subs_d.save()
+            except:
+                self._send_error(423, str(e))
+                return
+        subs_w = Subscriptions('subscriptions_Weekly.yml')
+        if topics_weekly != subs_w.topics(name):
+            subs_w.update_topics(name, topics_weekly)
+            try:
+                subs_w.save()
+            except:
+                self._send_error(423, str(e))
+                return
 
         html_topics = "\n".join(f"{' '*8}<li>{topic}</li>" for topic in topics)
         html_body = f"""
@@ -196,7 +217,7 @@ class handler(BaseHTTPRequestHandler):
         </head>
         <body>
             <h1>Thanks for subscribing!</h1>
-            <p>target: {target}</p>
+            <p>name: {name}</p>
             <p>token: {token}</p>
             <p>You have subscribed to the following topics:</p>
             <ul>
@@ -205,7 +226,7 @@ class handler(BaseHTTPRequestHandler):
         </body>
         </html>
         """
-        self.wfile.write(html_body.encode())
+        self._send_html(html_body)
 
 
 #------------------------------------------------------------------------------
