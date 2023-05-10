@@ -50,19 +50,6 @@ def token_status(token):
         print('Response could not be serialized')
         return {}
 
-
-def token_target(token):
-    '''Get target of a Line Access Token.
-
-    Args:
-        token (str): line access token
-
-    Returns:
-        (str): the target (e.g., the user name or the group name)
-    '''
-    return token_status(token).get('target', '')
-
-
 #------------------------------------------------------------------------------
 # handler of the Vercel serverless function
 #------------------------------------------------------------------------------
@@ -110,9 +97,9 @@ class handler(BaseHTTPRequestHandler):
         tbl = TokenTable('access_tokens.yml')
         name = tbl.gen_unique_name(target, token)
         if name != target:
-            # in case of regenerating tokens.
-            if token_status(tbl[target]).get('status') != 200:
-                tbl[target] = token
+            # in case of regenerating tokens (and remove old one).
+            if token_status(tbl[target]).get('status') == 401:
+                tbl[target] = token     # use new token
                 try:
                     tbl.save()
                 except Exception as e:
