@@ -145,7 +145,7 @@ class Drive:
 
         # Check if the current version matches the expected version
         if meta.get('version') != version:
-            print(f'actual: "{meta.get('version')}"; expected: "{version}"')
+            print(f"actual: {meta.get('version')}; expected: {version}")
             raise Exception("The file has been updated by someone else.")
 
         try:
