@@ -133,7 +133,7 @@ class Drive:
         file_id = cls._file_table[filename]
 
         # Convert the Python object to YAML string
-        yaml_str = yaml.dump(data)
+        yaml_str = yaml.dump(data, allow_unicode=True)
 
         # Pack the YAML string into the media format
         media = MediaIoBaseUpload(
