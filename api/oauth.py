@@ -2,7 +2,7 @@
 The module implement a Vercel Serverlesss Function to authorize Line Notify.
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2023/05/04 (initial version) ~ 2023/05/08 (last revision)"
+__date__ = "2023/05/04 (initial version) ~ 2023/05/10 (last revision)"
 
 __all__ = [
     'handler',
@@ -25,6 +25,16 @@ class handler(BaseHTTPRequestHandler):
     Note: The class name must be handler.
     '''
 
+    def _redirect_to(self, url):
+        '''Redirect to a given URL.
+
+        Args:
+            url (str): the URL that redirect to
+        '''
+        self.send_response(302)
+        self.send_header('Location', url)
+        self.end_headers()
+
     def do_GET(self):
         os.environ['STATE'] = secrets.token_hex(16)
         auth_params = {
@@ -37,9 +47,7 @@ class handler(BaseHTTPRequestHandler):
         }
         params = '&'.join([f'{k}={v}' for k, v in auth_params.items()])
         url = f"https://notify-bot.line.me/oauth/authorize?{params}"
-        self.send_response(302)
-        self.send_header('Location', url)
-        self.end_headers()
+        self._redirect_to(url)
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length'])
@@ -65,8 +73,5 @@ class handler(BaseHTTPRequestHandler):
         url = 'https://notify-bot.line.me/oauth/token'
         response = requests.post(url, data=token_params)
         token = response.json().get('access_token', '')
-
-        self.send_response(302)
-        self.send_header('Location', f"{HOME_URL}/api/subscribe?token={token}")
-        self.end_headers()
+        self._redirect_to(f"{HOME_URL}/api/subscribe?token={token}")
 
