@@ -172,6 +172,7 @@ class TokenTable:
         '''Save the token table back to the original YAML file.
         '''
         Drive().save_YAML(self._table, self._filename, self._version)
+        self._version = str(int(self._version) + 1)
 
     def clients(self):
         '''Get all clients (targets) in the table.
@@ -344,6 +345,7 @@ class Subscriptions:
         '''Save the subscriptions back to the original YAML file.
         '''
         Drive().save_YAML(self._table, self._filename, self._version)
+        self._version = str(int(self._version) + 1)
 
     def __iter__(self):
         for elem in self._table:
