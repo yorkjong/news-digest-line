@@ -85,9 +85,11 @@ class handler(BaseHTTPRequestHandler):
 
         subs_d = Subscriptions('subscriptions_Daily.yml')
         daily_topics = subs_d.subscribable_topics()
+        c = {}  # dict for comments to topics
+        c['IT'] = ' (AI, Software)'
         sel_d = lambda x: " selected" if x in subs_d.topics(name) else ""
         options_daily = "\n".join(
-            f'{" "*12}<option value="{t}"{sel_d(t)}>{t}</option>'
+            f'{" "*12}<option value="{t}"{sel_d(t)}>{t}{c.get(t, "")}</option>'
             for t in daily_topics)
 
         subs_w = Subscriptions('subscriptions_Weekly.yml')
