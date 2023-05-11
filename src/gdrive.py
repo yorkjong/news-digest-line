@@ -2,7 +2,7 @@
 The module implement operations of files in a folder in the Google Drive.
 """
 __author__ = "York <york.jong@gmail.com>"
-__date__ = "2023/05/05 (initial version) ~ 2023/05/10 (last revision)"
+__date__ = "2023/05/05 (initial version) ~ 2023/05/12 (last revision)"
 
 __all__ = [
     'TokenTable',
@@ -340,6 +340,16 @@ class TokenTable:
         for client in clients:
             del self._table[client]
 
+    def rename(self, old, new):
+        '''Rename a target/client.
+
+        Args:
+            old (str): the old name a target/client.
+            new (str): the new name of the target/client.
+        '''
+        if old in self._table and new not in self._table:
+            self._table[new] = self._table[old]
+            del self._table[old]
 
 class Subscriptions:
     '''Operations of a news-digest subscription table.
@@ -454,6 +464,23 @@ class Subscriptions:
             self.remove_clients(clients)
         else:
             self.remove_clients([clients])
+
+    def rename(self, old, new):
+        '''Rename a target/client.
+
+        Args:
+            old (str): the old name a target/client.
+            new (str): the new name of the target/client.
+        '''
+        all = self.clients()
+        if old not in all:
+            return
+        if new in all:
+            return
+        for _, clients in self._table:
+            if old in clients and new not in clients:
+                clients.remove(old)
+                clients.append(new)
 
 #------------------------------------------------------------------------------
 # Unit Test
