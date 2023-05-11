@@ -40,10 +40,10 @@ class handler(BaseHTTPRequestHandler):
         '''Send a error page.
 
         Args:
-            err_code (int): error code to send.
+            err_code (int): error code (e.g., 401, 423) to send.
             err_msg (str): error message to send.
         '''
-        self.send_response(err_code)    # 401, 404
+        self.send_response(err_code)
         self.end_headers()
         self.wfile.write(err_msg.encode())
 
@@ -85,8 +85,10 @@ class handler(BaseHTTPRequestHandler):
 
         subs_d = Subscriptions('subscriptions_Daily.yml')
         daily_topics = subs_d.subscribable_topics()
-        c = {}  # dict for comments to topics
-        c['IT'] = ' (AI, Software)'
+        # dict for comments to topics
+        c = {
+            'IT': ' (AI, Software)',
+        }
         sel_d = lambda x: " selected" if x in subs_d.topics(name) else ""
         options_daily = "\n".join(
             f'{" "*12}<option value="{t}"{sel_d(t)}>{t}{c.get(t, "")}</option>'
