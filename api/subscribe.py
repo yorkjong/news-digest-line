@@ -130,9 +130,12 @@ class handler(BaseHTTPRequestHandler):
         <input type="hidden" name="target" value="{name}"><br/><br/>
         <input type="submit" value="訂閱">
     </form>
-    <div style="background-color: #ffffcc; color: #000000; padding: 10px;">
+    <ul>
+    <li><div style="background-color: #ffffcc; color: #000000; padding: 10px;">
     請將此頁面加入書籤，以利後續更改訂閱主題
-    </div>
+    </div></li>
+    <li>"IT", "#AI..." 兩個分類的新聞有大量重複，建議擇一訂閱即可</li>
+    </ul>
 </body>
 </html>
 """
