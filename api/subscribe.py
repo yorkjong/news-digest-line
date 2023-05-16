@@ -88,6 +88,7 @@ class handler(BaseHTTPRequestHandler):
         # dict for comments to topics
         c = {
             'IT': ' (AI, Software)',
+            '#AI': ', #robotics, #brain',
         }
         sel_d = lambda x: " selected" if x in subs_d.topics(name) else ""
         options_daily = "\n".join(
