@@ -30,6 +30,13 @@ from gdrive import TokenTable, Subscriptions
 # handler of the Vercel serverless function
 #------------------------------------------------------------------------------
 
+# dict for comments to topics
+c = {
+    'IT': ' (AI, Software)',
+    '#AI': ', #robotics, #brain',
+}
+
+
 class handler(BaseHTTPRequestHandler):
     '''handler of the Vercel Serverless Function.
 
@@ -85,11 +92,6 @@ class handler(BaseHTTPRequestHandler):
 
         subs_d = Subscriptions('subscriptions_Daily.yml')
         daily_topics = subs_d.subscribable_topics()
-        # dict for comments to topics
-        c = {
-            'IT': ' (AI, Software)',
-            '#AI': ', #robotics, #brain',
-        }
         sel_d = lambda x: " selected" if x in subs_d.topics(name) else ""
         options_daily = "\n".join(
             f'{" "*12}<option value="{t}"{sel_d(t)}>{t}{c.get(t, "")}</option>'
@@ -187,7 +189,8 @@ class handler(BaseHTTPRequestHandler):
                 self._send_error(423, str(e))
                 return
 
-        html_topics = "\n".join(f"{' '*4}<li>{topic}</li>" for topic in topics)
+        html_topics = "\n".join(
+            f"{' '*4}<li>{t}{c.get(t, '')}</li>" for t in topics)
         html = f"""
 <!DOCTYPE html>
 <html>
