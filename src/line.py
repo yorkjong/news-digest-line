@@ -8,6 +8,7 @@ __all__ = [
     'notify_message',
     'token_status',
     'is_invalid_token',
+    'split_string',
 ]
 
 import requests
